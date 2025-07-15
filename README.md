@@ -24,21 +24,21 @@ go get github.com/crgimenes/backoff
 package main
 
 import (
-	"fmt"
-	"time"
+ "fmt"
+ "time"
 
-	"github.com/crgimenes/backoff"
+ "github.com/crgimenes/backoff"
 )
 
 func main() {
-	// Create a backoff with 500ms initial delay, 2x growth factor, 10s max delay
-	b := backoff.New(500*time.Millisecond, 2.0, 10*time.Second)
+ // Create a backoff with 500ms initial delay, 2x growth factor, 10s max delay
+ b := backoff.New(500*time.Millisecond, 2.0, 10*time.Second)
 
-	for i := range 5 {
-		wait := b.Next()
-		fmt.Printf("Retry #%d: waiting %v\n", i+1, wait)
-		time.Sleep(wait)
-	}
+ for i := range 5 {
+  wait := b.Next()
+  fmt.Printf("Retry #%d: waiting %v\n", i+1, wait)
+  time.Sleep(wait)
+ }
 }
 ```
 
@@ -122,6 +122,29 @@ b.Next() // 400ms
 // Reset for new operation
 b.Reset()
 b.Next() // 100ms (back to initial)
+```
+
+## Examples
+
+Complete working examples are available in the [`examples/`](examples/) directory:
+
+- **[Basic Usage](examples/basic/)** - Standard exponential backoff with jitter
+- **[Without Jitter](examples/without-jitter/)** - Predictable delays without randomization  
+- **[HTTP Retry](examples/http-retry/)** - Real-world HTTP client retry pattern
+- **[Reset Functionality](examples/reset/)** - Demonstrate state reset between operations
+
+To run any example:
+
+```bash
+cd examples/<example-name>
+go run main.go
+```
+
+Or run all examples:
+
+```bash
+cd examples
+make all
 ```
 
 ## API Reference
