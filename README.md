@@ -151,31 +151,38 @@ make all
 ### Types
 
 #### `Backoff`
+
 Exponential backoff calculator.
 
 #### `Option`
+
 Configuration function.
 
 ### Functions
 
 #### `New(initial time.Duration, factor float64, max time.Duration, opts ...Option) *Backoff`
+
 Creates a new Backoff instance.
 
 **Parameters:**
+
 - `initial`: Starting delay
 - `factor`: Multiplier for each delay (≥ 1.0)
 - `max`: Maximum delay
 - `opts`: Configuration options
 
 #### `WithJitter(enabled bool) Option`
+
 Enables or disables jitter.
 
 ### Methods
 
 #### `(b *Backoff) Next() time.Duration`
+
 Returns the next delay duration.
 
 #### `(b *Backoff) Reset()`
+
 Resets the backoff state.
 
 ## Testing
@@ -203,6 +210,7 @@ go test -bench=. ./...
 O(1) calculations with zero allocations per call. Uses mutex for thread safety.
 
 Benchmark results:
+
 ```
 BenchmarkBackoff_Next-8                50000000    25.4 ns/op    0 B/op    0 allocs/op
 BenchmarkBackoff_NextWithJitter-8      30000000    45.2 ns/op    0 B/op    0 allocs/op
