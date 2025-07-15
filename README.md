@@ -1,14 +1,13 @@
 # Backoff
 
-A thread-safe, configurable exponential backoff implementation for Go applications. This package provides a simple and efficient way to implement retry logic with exponential delays, commonly used in distributed systems, API clients, and error recovery mechanisms.
+Exponential backoff implementation for Go with optional jitter and thread safety. Implements retry logic with exponential delays for distributed systems, API clients, and error recovery.
 
 ## Features
 
-- **Thread-safe**: Safe for concurrent use across multiple goroutines
-- **Configurable**: Customizable initial delay, growth factor, and maximum delay
-- **Optional Jitter**: Helps prevent thundering herd problems in distributed systems
+- **Thread-safe**: Concurrent use across multiple goroutines
+- **Configurable**: Initial delay, growth factor, and maximum delay
+- **Optional Jitter**: Prevents thundering herd problems
 - **Zero Dependencies**: Uses only Go's standard library
-- **Lightweight**: Minimal memory footprint and CPU overhead
 
 ## Installation
 
@@ -152,49 +151,32 @@ make all
 ### Types
 
 #### `Backoff`
-
-Thread-safe exponential backoff calculator.
+Exponential backoff calculator.
 
 #### `Option`
-
-Configuration function type for customizing Backoff behavior.
+Configuration function.
 
 ### Functions
 
 #### `New(initial time.Duration, factor float64, max time.Duration, opts ...Option) *Backoff`
-
 Creates a new Backoff instance.
 
 **Parameters:**
-
-- `initial`: Starting delay duration
-- `factor`: Multiplier for each subsequent delay (should be ≥ 1.0)
-- `max`: Maximum delay duration (upper bound)
-- `opts`: Optional configuration functions
-
-**Returns:** Configured Backoff instance
+- `initial`: Starting delay
+- `factor`: Multiplier for each delay (≥ 1.0)
+- `max`: Maximum delay
+- `opts`: Configuration options
 
 #### `WithJitter(enabled bool) Option`
-
-Option to enable or disable jitter.
-
-**Parameters:**
-
-- `enabled`: true to enable jitter (default), false to disable
-
-**Returns:** Option function
+Enables or disables jitter.
 
 ### Methods
 
 #### `(b *Backoff) Next() time.Duration`
-
-Calculates and returns the next delay duration.
-
-**Returns:** Duration to wait before next retry
+Returns the next delay duration.
 
 #### `(b *Backoff) Reset()`
-
-Resets the backoff state to initial values.
+Resets the backoff state.
 
 ## Testing
 
@@ -218,14 +200,9 @@ go test -bench=. ./...
 
 ## Performance
 
-The backoff implementation is highly optimized for performance:
+O(1) calculations with zero allocations per call. Uses mutex for thread safety.
 
-- **Memory**: Minimal allocations, reuses internal state
-- **CPU**: Fast O(1) calculations with simple arithmetic
-- **Concurrency**: Efficient mutex-based synchronization
-
-Benchmark results on typical hardware:
-
+Benchmark results:
 ```
 BenchmarkBackoff_Next-8                50000000    25.4 ns/op    0 B/op    0 allocs/op
 BenchmarkBackoff_NextWithJitter-8      30000000    45.2 ns/op    0 B/op    0 allocs/op
@@ -234,41 +211,38 @@ BenchmarkBackoff_Concurrent-8          20000000    67.8 ns/op    0 B/op    0 all
 
 ## Best Practices
 
-1. **Choose appropriate parameters**: Start with reasonable initial delays (100ms-1s) and factors (1.5-2.0)
-2. **Set reasonable maximums**: Prevent excessive delays with appropriate max values (10s-60s)
-3. **Use jitter in distributed systems**: Helps prevent thundering herd effects
-4. **Reset between operations**: Call `Reset()` when starting new retry sequences
-5. **Consider context cancellation**: Combine with `context.Context` for proper timeout handling
+1. **Parameters**: Use initial delays of 100ms-1s and factors of 1.5-2.0
+2. **Maximum delays**: Set max values between 10s-60s to prevent excessive waits
+3. **Jitter**: Enable in distributed systems to prevent thundering herd
+4. **Reset**: Call `Reset()` when starting new retry sequences
+5. **Timeouts**: Combine with `context.Context` for timeout handling
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass (`go test ./...`)
-6. Run `go fmt` to format code
-7. Commit your changes (`git commit -am 'Add amazing feature'`)
-8. Push to the branch (`git push origin feature/amazing-feature`)
-9. Open a Pull Request
+2. Create a feature branch (`git checkout -b feature/name`)
+3. Add tests for new functionality
+4. Ensure all tests pass (`go test ./...`)
+5. Run `go fmt` to format code
+6. Commit and push changes
+7. Open a Pull Request
 
-### Development Guidelines
+### Guidelines
 
-- Follow Go conventions and idioms
-- Write table-driven tests for new features
+- Follow Go conventions
+- Write table-driven tests
 - Maintain backward compatibility
 - Update documentation for API changes
-- Ensure cross-platform compatibility (Linux, macOS, Windows)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file.
 
 ## Related Projects
 
-- [cenkalti/backoff](https://github.com/cenkalti/backoff) - More feature-rich backoff library
-- [jpillora/backoff](https://github.com/jpillora/backoff) - Simple backoff implementation
-- [lestrrat-go/backoff](https://github.com/lestrrat-go/backoff) - Highly configurable backoff library
+- [cenkalti/backoff](https://github.com/cenkalti/backoff)
+- [jpillora/backoff](https://github.com/jpillora/backoff)
+- [lestrrat-go/backoff](https://github.com/lestrrat-go/backoff)
 
 ## Changelog
 
