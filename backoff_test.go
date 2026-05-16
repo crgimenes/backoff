@@ -226,11 +226,11 @@ func TestBackoff_Concurrency(t *testing.T) {
 	results := make([][]time.Duration, numGoroutines)
 
 	// Launch concurrent goroutines
-	for i := 0; i < numGoroutines; i++ {
+	for i := range numGoroutines {
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			for j := 0; j < callsPerGoroutine; j++ {
+			for range callsPerGoroutine {
 				duration := b.Next()
 				results[index] = append(results[index], duration)
 			}
@@ -295,7 +295,7 @@ func TestBackoff_EdgeCases(t *testing.T) {
 			b := New(tt.initial, tt.factor, tt.max, WithJitter(tt.jitter))
 
 			// Should not panic and should return reasonable values
-			for i := 0; i < 5; i++ {
+			for i := range 5 {
 				duration := b.Next()
 				if duration < 0 {
 					t.Errorf("Next() call %d returned negative duration: %v", i+1, duration)

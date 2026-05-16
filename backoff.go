@@ -52,10 +52,7 @@ func (b *Backoff) Next() time.Duration {
 		b.initialized = true
 	} else {
 		// calcula expoencial
-		next := time.Duration(float64(b.current) * b.factor)
-		if next > b.max {
-			next = b.max
-		}
+		next := min(time.Duration(float64(b.current)*b.factor), b.max)
 		b.current = next
 	}
 

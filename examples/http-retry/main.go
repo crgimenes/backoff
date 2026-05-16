@@ -14,7 +14,7 @@ func fetchWithRetry(url string, maxRetries int) (*http.Response, error) {
 	var resp *http.Response
 	var err error
 
-	for i := 0; i < maxRetries; i++ {
+	for i := range maxRetries {
 		resp, err = http.Get(url)
 		if err == nil && resp.StatusCode == http.StatusOK {
 			return resp, nil
