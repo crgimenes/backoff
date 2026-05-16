@@ -3,20 +3,35 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
-	"github.com/crgimenes/backoff"
+	backoff "github.com/crgimenes/backoff"
 )
 
-func fetchWithRetry(url string, maxRetries int) (*http.Response, error) {
+func fetchWithRetry(rawURL string, maxRetries int) (*http.Response, error) {
+	parsedURL, err := url.ParseRequestURI(rawURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid URL: %w", err)
+	}
+	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+		return nil, fmt.Errorf("unsupported URL scheme: %s", parsedURL.Scheme)
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
 	b := backoff.New(100*time.Millisecond, 2.0, 5*time.Second)
 
 	var resp *http.Response
-	var err error
+	var reqErr error
 
 	for i := range maxRetries {
-		resp, err = http.Get(url)
-		if err == nil && resp.StatusCode == http.StatusOK {
+		req, err := http.NewRequest(http.MethodGet, parsedURL.String(), nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create request: %w", err)
+		}
+
+		resp, reqErr = client.Do(req)
+		if reqErr == nil && resp.StatusCode == http.StatusOK {
 			return resp, nil
 		}
 
@@ -27,7 +42,7 @@ func fetchWithRetry(url string, maxRetries int) (*http.Response, error) {
 		}
 	}
 
-	return resp, err
+	return resp, reqErr
 }
 
 func main() {

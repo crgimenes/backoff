@@ -1,7 +1,8 @@
 package backoff
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"math/big"
 	"sync"
 	"time"
 )
@@ -58,7 +59,17 @@ func (b *Backoff) Next() time.Duration {
 
 	// aplica jitter completo: [0, current)
 	if b.withJitter {
-		return time.Duration(rand.Int63n(int64(b.current + 1)))
+		maxJitter := b.current + 1
+		if maxJitter <= 0 {
+			return 0
+		}
+
+		jitter, err := rand.Int(rand.Reader, big.NewInt(int64(maxJitter)))
+		if err != nil {
+			return b.current
+		}
+
+		return time.Duration(jitter.Int64())
 	}
 	return b.current
 }
