@@ -1,3 +1,3 @@
 module github.com/crgimenes/backoff
 
-go 1.25
+go 1.26.3
